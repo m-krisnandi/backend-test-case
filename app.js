@@ -1,12 +1,12 @@
 const express = require('express');
-const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
 const app = express();
 
-// Router books
+// Router
 const booksRouter = require('./app/api/v1/books/router')
+const membersRouter = require('./app/api/v1/members/router')
 
 const v1 = '/api/v1'
 
@@ -22,5 +22,6 @@ app.get('/', (req, res) => {
 });
 
 app.use(v1, booksRouter)
+app.use(v1, membersRouter)
 
 module.exports = app;
