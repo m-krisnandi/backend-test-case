@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const moment = require("moment-timezone");
 
 const memberSchema = new mongoose.Schema(
   {
@@ -16,7 +17,7 @@ const memberSchema = new mongoose.Schema(
       default: false,
     },
     penaltyDate: {
-      type: Date,
+      type: String,
       default: null,
     },
     borrowedBooks: [
@@ -26,8 +27,8 @@ const memberSchema = new mongoose.Schema(
           ref: "Book",
         },
         borrowDate: {
-          type: Date,
-          default: Date.now,
+          type: String,
+          default: () => moment().tz("Asia/Jakarta"),
         },
       },
     ],

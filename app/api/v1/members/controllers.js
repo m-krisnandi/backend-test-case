@@ -1,5 +1,6 @@
 const Members = require("./models");
 const Books = require("../books/models");
+const moment = require("moment-timezone");
 
 const create = async (req, res) => {
   try {
@@ -25,7 +26,9 @@ const index = async (req, res) => {
         path: "borrowedBooks.book",
         select: "-_id code title author",
       })
-      .select("_id code name penalty penaltyDate borrowedBooks.book borrowedBooks.borrowDate");
+      .select(
+        "_id code name penalty penaltyDate borrowedBooks.book borrowedBooks.borrowDate"
+      );
     res.status(200).json({
       data: result,
     });
@@ -123,15 +126,21 @@ const returnBook = async (req, res) => {
     }
 
     const returnDate = new Date();
-    const borrowDate = borrowedBook.borrowDate;
+    const borrowDate = new Date(borrowedBook.borrowDate);
     const timeDifference = returnDate.getTime() - borrowDate.getTime();
     const daysDifference = Math.abs(timeDifference / (1000 * 3600 * 24));
 
     if (daysDifference > 7) {
       member.penalty = true;
-      member.penaltyDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000); // 3 hari ke depan
-
+      member.penaltyDate = moment().tz("Asia/Jakarta").add(3, "days").format();
       await member.save();
+
+      setTimeout(async () => {
+        member.penalty = false;
+        member.penaltyDate = null;
+        await member.save();
+      }, 3 * 24 * 60 * 60 * 1000);
+
       member.borrowedBooks = member.borrowedBooks.filter(
         (b) => b.book.toString() !== book._id.toString()
       );
@@ -140,7 +149,7 @@ const returnBook = async (req, res) => {
       book.stock++;
       await book.save();
       return res.status(400).json({
-        message: "Buku dikembalikan setelah 7 hari. Penalti diterapkan.",
+        message: "Buku dikembalikan setelah 7 hari. Sanksi diterapkan.",
       });
     }
 
