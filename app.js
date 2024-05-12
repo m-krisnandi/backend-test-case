@@ -1,6 +1,8 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
+const { port } = require("./app/config");
+const swaggerDocs = require('./app/utils/swagger')
 
 const app = express();
 
@@ -23,5 +25,7 @@ app.get("/", (req, res) => {
 
 app.use(v1, booksRouter);
 app.use(v1, membersRouter);
+
+swaggerDocs(app, port)
 
 module.exports = app;

@@ -17,7 +17,6 @@ const bookSchema = new mongoose.Schema(
     },
     stock: {
       type: Number,
-      required: [true, "stock harus diisi"],
       default: 1,
     },
   },
